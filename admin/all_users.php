@@ -231,11 +231,14 @@ td img {
             <img src="../assets/img/giphy.gif" alt="CityCare Logo">
             <h2>CityCare</h2>
         </div>
+
         <ul class="nav-links">
-            <li><a href="dashboard.php">Dashboard</a></li>
-            <li><a href="all_users.php">All Users</a></li>
-            <li><a href="profile.php">My Profile</a></li>
-            <li><a href="../api/logout.php">Logout</a></li>
+            <li><a href="../public/index.php">Home</a></li>
+            <li><a href="../admin/dashboard.php">Dashboard</a></li>
+            <li><a href="all_users.php">Users</a></li>
+            <li><a href="manage_reports.php">Reports</a></li>
+            <li><a href="../dashboard/profile.php">Profile</a></li>
+            <li><a href="../public/logout.php">Logout</a></li>
         </ul>
     </div>
 </header>

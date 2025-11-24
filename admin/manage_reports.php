@@ -22,15 +22,23 @@ $profileImage = !empty($user['profile_image']) && file_exists("../uploads/" . $u
 
 // Handle status update
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['report_id'], $_POST['status'])) {
-    $updateStmt = $conn->prepare("UPDATE reports SET status = ? WHERE id = ? AND user_id = ?");
-    $updateStmt->execute([$_POST['status'], $_POST['report_id'], $userId]);
-    header("Location: dashboard.php"); // refresh page to show changes
+    $updateStmt = $conn->prepare("UPDATE reports SET status = ? WHERE id = ?");
+    $updateStmt->execute([$_POST['status'], $_POST['report_id']]);
+    header("Location: dashboard.php");
     exit();
 }
 
-// Fetch all reports for this user
-$stmtReports = $conn->prepare("SELECT r.*, u.name, u.surname FROM reports r JOIN users u ON r.user_id = u.id WHERE r.user_id = ? ORDER BY r.created_at DESC");
-$stmtReports->execute([$userId]);
+// Handle report deletion
+if (isset($_GET['delete_id'])) {
+    $deleteStmt = $conn->prepare("DELETE FROM reports WHERE id = ?");
+    $deleteStmt->execute([$_GET['delete_id']]);
+    header("Location: dashboard.php");
+    exit();
+}
+
+// Fetch all reports
+$stmtReports = $conn->prepare("SELECT r.*, u.name, u.surname FROM reports r JOIN users u ON r.user_id = u.id ORDER BY r.created_at DESC");
+$stmtReports->execute();
 $reports = $stmtReports->fetchAll(PDO::FETCH_ASSOC);
 
 // Count total reports
@@ -42,35 +50,27 @@ $totalReports = count($reports);
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>User Dashboard – CityCare</title>
+<title>Admin Dashboard -- CityCare</title>
 
-<style>/* Reset & Base Styles */
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-}
+<!-- Google Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Stack+Sans+Notch:wght@200..700&display=swap" rel="stylesheet">
 
-body {
-    font-family: 'Inter', sans-serif;
-    background: #f4f6f8;
-    color: #333;
-    line-height: 1.6;
-}
+<style>
+/* Reset & Base */
+* { box-sizing: border-box; margin:0; padding:0; }
+body { font-family: sans-serif; background: #f4f6f8; color: #333; line-height: 1.6; }
+a { text-decoration: none; color: inherit; }
 
-a {
-    text-decoration: none;
-    color: inherit;
-}
-
-/* Header Section */
+/* Header */
 header {
     width: 100%;
     background: #284b63;
     position: sticky;
     top: 0;
     z-index: 100;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
 }
 
 .header-container {
@@ -82,48 +82,37 @@ header {
     padding: 12px 30px;
 }
 
-.header-container .logo {
+.logo {
     display: flex;
     align-items: center;
     gap: 12px;
 }
 
-.header-container .logo img {
-    width: 50px;
-}
-
-.header-container .logo h2 {
-    color: #fff;
-    font-weight: 700;
-    font-size: 1.5rem;
-}
+.logo img { width: 50px; }
+.logo h2 { font-family: 'Stack Sans Notch', sans-serif; color: #fff; font-weight: 600; font-size: 2rem; }
 
 .nav-links {
     list-style: none;
     display: flex;
     gap: 20px;
+    align-items: center;
 }
 
 .nav-links li a {
+    font-family: 'Stack Sans Notch', sans-serif;
     color: #fff;
-    font-weight: 600;
+    font-weight: 500;
     padding: 8px 16px;
     border-radius: 6px;
     transition: 0.3s;
 }
 
-.nav-links li a:hover {
-    background: #3c6e71;
-}
+.nav-links li a:hover { background: #3c6e71; }
 
-/* Main Container */
-.container {
-    max-width: 1200px;
-    margin: 30px auto;
-    padding: 0 20px;
-}
+/* Container */
+.container { max-width: 1200px; margin: 30px auto; padding: 0 20px; }
 
-/* Statistics Cards */
+/* Stats Cards */
 .stats-cards {
     display: flex;
     gap: 20px;
@@ -136,28 +125,17 @@ header {
     background: #fff;
     padding: 25px 20px;
     border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
     text-align: center;
     transition: 0.3s;
 }
 
-.card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
-}
+.card:hover { transform: translateY(-4px); box-shadow:0 8px 20px rgba(0,0,0,0.15); }
 
-.card h3 {
-    font-size: 2rem;
-    margin-bottom: 8px;
-    color: #284b63;
-}
+.card h3 { font-size: 2rem; margin-bottom: 8px; color: #284b63; }
+.card p { font-size: 1rem; color: #555; }
 
-.card p {
-    font-size: 1rem;
-    color: #555;
-}
-
-/* Table Styles */
+/* Table */
 table {
     width: 100%;
     border-collapse: collapse;
@@ -165,7 +143,7 @@ table {
     background: #fff;
     border-radius: 8px;
     overflow: hidden;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
 }
 
 th, td {
@@ -175,19 +153,10 @@ th, td {
     vertical-align: middle;
 }
 
-th {
-    background: #284b63;
-    color: #fff;
-    font-weight: 600;
-}
+th { background: #284b63; color: #fff; font-weight: 600; }
 
-tr:nth-child(even) {
-    background: #f9f9f9;
-}
-
-tr:hover {
-    background: #e0f0f5;
-}
+tr:nth-child(even) { background: #f9f9f9; }
+tr:hover { background: #e0f0f5; }
 
 .reports-table img {
     width: 60px;
@@ -206,29 +175,26 @@ tr:hover {
     font-weight: 500;
 }
 
-.status-select option {
-    font-weight: 500;
+/* Search Input */
+#searchInput {
+    margin-bottom: 20px;
+    padding: 8px 12px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    width: 100%;
+    max-width: 400px;
 }
 
-/* Responsive Design */
-@media (max-width: 768px) {
-    .stats-cards {
-        flex-direction: column;
-    }
-    
-    .nav-links {
-        flex-direction: column;
-        gap: 10px;
-    }
-    
-    table {
-        font-size: 14px;
-    }
+/* Responsive */
+@media (max-width:768px) {
+    .stats-cards { flex-direction: column; }
+    .nav-links { flex-direction: column; width: 100%; gap: 10px; }
+    table { font-size: 14px; }
 }
 </style>
 </head>
-<body>
 
+<body>
 <header>
     <div class="header-container">
         <div class="logo">
@@ -245,7 +211,6 @@ tr:hover {
 </header>
 
 <div class="container">
-
     <!-- Stats cards -->
     <div class="stats-cards">
         <div class="card">
@@ -254,9 +219,12 @@ tr:hover {
         </div>
     </div>
 
-    <!-- All Reports -->
-    <h2>All My Reports</h2>
-    <table class="reports-table">
+    <!-- Search -->
+    <input type="text" id="searchInput" placeholder="Search reports...">
+
+    <!-- Reports Table -->
+    <table class="reports-table" id="reportsTable">
+        <thead>
         <tr>
             <th>ID</th>
             <th>Title</th>
@@ -266,7 +234,10 @@ tr:hover {
             <th>Image</th>
             <th>User Name</th>
             <th>Date</th>
+            <th>Action</th>
         </tr>
+        </thead>
+        <tbody>
         <?php foreach($reports as $report): ?>
         <tr>
             <td><?= htmlspecialchars($report['id']) ?></td>
@@ -293,10 +264,27 @@ tr:hover {
             </td>
             <td><?= htmlspecialchars($report['name'] . ' ' . $report['surname']) ?></td>
             <td><?= htmlspecialchars($report['created_at']) ?></td>
+            <td>
+                <a href="?delete_id=<?= $report['id'] ?>" style="color:red;" onclick="return confirm('Are you sure?')">Delete</a>
+            </td>
         </tr>
         <?php endforeach; ?>
+        </tbody>
     </table>
-
 </div>
+
+<script>
+// Simple search filter
+const searchInput = document.getElementById('searchInput');
+searchInput.addEventListener('keyup', function() {
+    const filter = this.value.toLowerCase();
+    const rows = document.querySelectorAll('#reportsTable tbody tr');
+    rows.forEach(row => {
+        const text = row.textContent.toLowerCase();
+        row.style.display = text.includes(filter) ? '' : 'none';
+    });
+});
+</script>
+
 </body>
 </html>

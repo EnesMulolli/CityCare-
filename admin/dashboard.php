@@ -377,5 +377,9 @@ tr:hover {
 
 </div>
 
+        <a href="../public/report_issues.php" class="add-report-btn">
+        + Report Something
+        </a>
+
 </body>
 </html>

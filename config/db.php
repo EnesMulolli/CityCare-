@@ -2,7 +2,7 @@
 
 
 $host = "localhost";
-$dbname = "citycaredb";
+$dbname = "citycareDB";
 $user = "root";
 $pass = "";
 
