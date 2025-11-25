@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Nov 24, 2025 at 11:35 PM
+-- Generation Time: Nov 25, 2025 at 11:08 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -43,7 +43,9 @@ CREATE TABLE `reports` (
 --
 
 INSERT INTO `reports` (`id`, `user_id`, `title`, `description`, `location`, `image`, `status`, `created_at`) VALUES
-(1, 1, 'Street Lights', 'broken trafic lights', 'Prishtina/Dardani', '6924d9e3599aa.jpg', 'In Progress', '2025-11-24 22:19:15');
+(1, 1, 'Street Lights', 'broken trafic lights', 'Prishtina/Dardani', '6924d9e3599aa.jpg', 'Resolved', '2025-11-24 22:19:15'),
+(2, 3, 'Parks & Trees', 'fallen trees all over the neighbourhood', 'Prishtina/Germi', '6926220ee8be4.jpg', 'In Review', '2025-11-25 21:39:26'),
+(3, 2, 'Other', 'test desc', 'Test/Test', '692623778ac55.jpg', 'Pending', '2025-11-25 21:45:27');
 
 -- --------------------------------------------------------
 
@@ -71,7 +73,8 @@ CREATE TABLE `users` (
 INSERT INTO `users` (`id`, `name`, `surname`, `username`, `location`, `profile_image`, `email`, `password`, `role`, `created_at`) VALUES
 (1, 'admin', 'admin', 'admin123', 'Prishtina', 'default.webp', 'admin@example.com', '$2y$10$b/WaLRb3yGxwcCJjM9hHaeFWJ4G29JXx4zI9Esac7IJzizcX1/GoW', 'admin', '2025-11-24 20:11:29'),
 (2, 'Enes', 'Mulolli', 'enesmulolli', 'Prishtina', 'default.webp', 'enesmulolli59@gmail.com', '$2y$10$HT7GkBB/f1eg7NcZwhw3TuyyUfUP6mXgXW1ClIQykJLyAA8cmmAA.', 'admin', '2025-11-24 20:11:29'),
-(3, 'User', 'Normal', 'normaluser', 'Skenderaj', 'default.webp', 'efgfwaocklrsdgjkda@nespj.com', '$2y$10$Xu6h2JZIhGe4PwB9eOps6OvtQTdcgjf0QCe87EqoM3PCthlLKN7NG', 'user', '2025-11-24 21:40:00');
+(3, 'User', 'Normal', 'normaluser', 'Skenderaj', 'default.webp', 'efgfwaocklrsdgjkda@nespj.com', '$2y$10$Xu6h2JZIhGe4PwB9eOps6OvtQTdcgjf0QCe87EqoM3PCthlLKN7NG', 'user', '2025-11-24 21:40:00'),
+(4, 'Test', 'Acc', 'testacc', 'Test', 'default.webp', 'efgfwabrgejuydgjkda@nespj.com', '$2y$10$Anq7w5YeiSX6RruKrKOKzO12FaLx4YjU369pgDacIirN0WQNWoCRa', 'user', '2025-11-25 21:58:54');
 
 --
 -- Indexes for dumped tables
@@ -99,13 +102,13 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `reports`
 --
 ALTER TABLE `reports`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- Constraints for dumped tables
